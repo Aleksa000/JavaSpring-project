@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="css/bootstrap.css">
+    <link rel="stylesheet" href="css/signin.css">
+    <link rel="stylesheet" href="lib/toastr/css/toastr.min.css">
+</head>
+<body class="text-center">
+<main class="form-signin">
+    <form id="form">
+        <img class="mb-4" src="img/carousel-1.jpg" alt="" width="72" height="57">
+        <h1 class="h3 mb-3 fw-normal">Login</h1>
+        <div class="form-floating">
+            <input type="email" class="form-control" id="mejl" placeholder="name@example.com">
+            <label for="mejl">Email address</label>
+        </div>
+        <div class="form-floating">
+            <input type="password" class="form-control" id="lozinka" placeholder="Password">
+            <label for="lozinka">Password</label>
+        </div>
+        <button class="w-100 btn btn-lg btn-primary" id="btn-submit" type="button">Login</button>
+    </form>
+</main>
+</body>
+</html>
+
+<script src="js/bootstrap.js"></script>
+
+<script
+        src="https://code.jquery.com/jquery-3.6.0.min.js"
+        integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
+        crossorigin="anonymous">
+</script>
+
+<script src="lib/toastr/js/toastr.min.js"></script>
+
+<script>
+
+    $(document).ready(function() {
+        $("#btn-submit").click(function (){
+            var dataForm= { "mejl": $("#mejl").val(), "lozinka": $("#lozinka").val() };
+
+            $.ajax({
+                url: 'http://localhost:8080/authorization/login',
+                type: "POST",
+                contentType: "application/json; charset=utf-8",
+                data: JSON.stringify(dataForm),
+                beforeSend: function (xhr) {
+                   xhr.setRequestHeader ("Authorization", 'Bearer ' + localStorage.getItem("token"));
+                },
+                error: function (result){
+                    toastr.error(result.responseText);
+                },
+                success: function (result) {
+                    localStorage.setItem("token", result);
+                    location.replace("testAjaxCall.html");
+                }
+            });
+        });
+    });
+</script>

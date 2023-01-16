@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Users</title>
+    <link rel="stylesheet" href="css/bootstrap.css">
+</head>
+<body>
+<div class="container-fluid">
+    <main class="col-md-12 col-lg-12 p-5">
+        <div class="table-responsive">
+            <table class="table table-striped table-sm">
+                <thead>
+                <tr>
+                    <th scope="col">id</th>
+                    <th scope="col" class="text-center">first name</th>
+                    <th scope="col" class="text-center">last name</th>
+                    <th scope="col" class="text-center">email</th>
+                    <th scope="col" class="text-center">phone</th>
+                    <th scope="col" class="text-center">address</th>
+                    <th scope="col" class="text-center">options</th>
+                    <th scope="col" class="text-end"><a href="index.html" class="btn btn-success">Back</a></th>
+                </tr>
+                </thead>
+                <tbody id="table-body"></tbody>
+            </table>
+        </div>
+    </main>
+</div>
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="modal-content">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
+<script src="js/bootstrap.js"></script>
+
+<script
+        src="https://code.jquery.com/jquery-3.6.0.min.js"
+        integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
+        crossorigin="anonymous"></script>
+
+<script>
+
+    $(document).ready(function() {
+        $.ajax({
+            url: 'http://localhost:8080/user/index',
+            type: "GET",
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader ("Authorization", 'Bearer ' + localStorage.getItem("token"));
+            },
+            success: function (result){
+            $.each(result, function(i, item) {
+                $("#table-body").append(
+                    "<tr>\n" +
+                    "<td>" + item.id + "</td>\n" +
+                    "<td class=\"text-center\">" + item.firstName + "</td>\n" +
+                    "<td class=\"text-center\">" + item.lastName + "</td>\n" +
+                    "<td class=\"text-center\">" + item.email + "</td>\n" +
+                    "<td class=\"text-center\">" + item.phone + "</td>\n" +
+                    "<td class=\"text-center\">" + item.address + "</td>\n" +
+
+
+                    "<td class=\"text-center\">" +
+                    "<a href='javascript:;' data-route=\"http://localhost:8080/user/get/user/by/id?id=" + item.id + "\" class=\"btn btn-primary btn-edit-helper\" data-bs-toggle=\"modal\" data-bs-target=\"#exampleModal\">Edit</a>\n" +
+                    "<a href='javascript:;' data-route=\"http://localhost:8080/user/get/user/by/id?id=" + item.id + "\" class=\"btn btn-danger btn-delete-helper\"  data-bs-toggle=\"modal\" data-bs-target=\"#exampleModal\">Delete</a>" +
+                    "</td>\n" +
+                    "<td></td>\n" +
+                    " </tr>"
+                );
+            });
+            }
+        });
+    });
+    $(document).on('click', '.btn-edit-helper', function () {
+        $("#modal-content").empty();
+        var url = $(this).data("route");
+
+        $.ajax({
+            url: url,
+            type: "GET",
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader ("Authorization", 'Bearer ' + localStorage.getItem("token"));
+            },
+            success: function (result) {
+                if (result == null) {
+                    $("#modal-content").append("Object is not found!");
+                } else {
+                    $("#modal-content").append(
+                        '<main class="col-md-12 col-lg-12 p-5">\n' +
+                        '        <form action="" id="edit-form">\n' +
+                        '                <input type="hidden" name="id" id="id" class="form-control" value="' + result.id + '">\n' +
+                        '            <div class="m-3">\n' +
+                        '                <label for="firstName">First name:</label>\n' +
+                        '                <input type="text" name="firstName" id="firstName" class="form-control" value="' + result.firstName + '">\n' +
+                        '            </div>\n' +
+                        '              <div class="m-3">\n' +
+                        '                   <label for="lastName">Last name:</label>\n' +
+                        '                   <input type="text" name="lastName" id="lastName" class="form-control" value="' + result.lastName + '">\n' +
+                        '              </div>\n' +
+                        '            <div class="m-3">\n' +
+                        '                <label for="email">Email:</label>\n' +
+                        '                <input type="email" name="email" id="email" class="form-control" value="' + result.email + '">\n' +
+                        '            </div>\n' +
+                        '               <div class="m-3">\n' +
+                        '                    <label for="phone">Phone:</label>\n' +
+                        '                    <input type="text" name="phone" id="phone" class="form-control" value="' + result.phone + '">\n' +
+                        '                </div>\n' +
+                        '                   <div class="m-3">\n' +
+                        '                    <label for="address">Address:</label>\n' +
+                        '                    <input type="text" name="address" id="address" class="form-control" value="' + result.address + '">\n' +
+                        '                     </div>\n' +
+                        '            <div class="m-3">\n' +
+                        '            <button type="button" id="btn-edit-submit" class="btn btn-primary">Submit</button>\n' +
+                        '            </div>\n' +
+                        '        </form>\n' +
+                        '        <div class="p-5" id="body-for-append">\n' +
+                        '        </div>\n' +
+                        '    </main>');
+                }
+            }
+        });
+    });
+    $(document).on('click', '#btn-edit-submit', function () {
+        var dataForm = { "id": $("#id").val(), "firstName": $("#firstName").val(),"lastName": $("#lastName").val(), "email": $("#email").val(), "phone": $("#phone").val(), "address": $("#address").val()};
+
+        $.ajax({
+            url: 'http://localhost:8080/user/edit',
+            type: "POST",
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            data: JSON.stringify(dataForm),
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader ("Authorization", 'Bearer ' + localStorage.getItem("token"));
+            },
+            success: function (result){
+                location.replace("testAjaxCall.html");
+            }
+        });
+    });
+
+    $(document).on('click', '.btn-delete-helper', function () {
+        $("#modal-content").empty();
+        var url = $(this).data("route");
+        $.get(url, function (result) {
+            if (result == null)
+            {
+                $("#modal-content").append("Object is not found!");
+            }else{
+                $("#modal-content").append(
+                    '<main class="col-md-12 col-lg-12 p-5">\n' +
+                    '<h5>Da li ste sigurni da zelite da obrisete ovaj objekat?</h5>\n' +
+                    '        <form action="" id="edit-form">\n' +
+                    '                <input type="hidden" name="id" id="id" class="form-control" value="'+result.id+'">\n' +
+                    '            <div class="m-3">\n' +
+                    '                <label for="firstName">First name:</label>\n' +
+                    '                <input type="text" name="firstName" id="firstName" class="form-control" value="'+result.firstName+'">\n' +
+                    '            </div>\n' +
+                    '              <div class="m-3">\n'+
+                    '                   <label for="lastName">Last name:</label>\n' +
+                    '                   <input type="text" name="lastName" id="lastName" class="form-control" value="'+result.lastName+'">\n'+
+                    '              </div>\n'+
+                    '            <div class="m-3">\n' +
+                    '                <label for="email">Email:</label>\n' +
+                    '                <input type="email" name="email" id="email" class="form-control" value="'+result.email+'">\n' +
+                    '            </div>\n' +
+                    '               <div class="m-3">\n'+
+                    '                    <label for="phone">Phone:</label>\n'+
+                    '                    <input type="text" name="phone" id="phone" class="form-control" value="'+result.phone+'">\n'+
+                    '                </div>\n'+
+                    '                   <div class="m-3">\n'+
+                    '                    <label for="address">Address:</label>\n' +
+                    '                    <input type="text" name="address" id="address" class="form-control" value="'+result.address+'">\n'+
+                    '                     </div>\n'+
+                    '                 <div class="m-3">\n' +
+                    '                   <label for="password">Password:</label>\n' +
+                    '                    <input type="text" name="password" id="password" class="form-control" value="'+result.password+'">\n'+
+                    '                   </div>\n'+
+                    '            <div class="m-3">\n' +
+                    '            <button type="button" id="btn-delete-submit" class="btn btn-primary">Submit</button>\n' +
+                    '            </div>\n' +
+                    '        </form>\n' +
+                    '        <div class="p-5" id="body-for-append">\n' +
+                    '        </div>\n' +
+                    '    </main>');
+            }
+        });
+    });
+    $(document).on('click', '#btn-delete-submit', function () {
+        var dataForm = { "id": $("#id").val()};
+
+        $.ajax({
+            url: 'http://localhost:8080/user/delete',
+            type: "POST",
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            data: JSON.stringify(dataForm),
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader ("Authorization", 'Bearer ' + localStorage.getItem("token"));
+            },
+            success: function (result){
+
+                location.replace("testAjaxCall.html");
+            }
+        });
+
+        location.replace("testAjaxCall.html");
+    });
+</script>
